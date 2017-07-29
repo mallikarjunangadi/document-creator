@@ -1,0 +1,18 @@
+.App {
+  text-align: center;
+}
+.App form input{
+  margin: 5px;
+}
+
+
+.react-select-option {
+  display: flex;
+  align-items: center;
+  padding: auto;
+  font-size: 14px;
+  text-indent: 4px;
+  margin: auto;
+  
+}
+
