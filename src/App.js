@@ -7,19 +7,19 @@ class App extends Component {
 
     this.state = {
       orgId: '',
-      orgName: '',
+      orgName: {},
       orgLogo: '',
       slideImages: [],
       channelsArr: [{ channelId: '', channelName: '', admin: '', moderator: '' }],
       langs: ['eng'],
-      feedsArr: [{ fName: '', fIcon: '', fTarget: '', fId: '', fRunsOn: '' }],
+      feedsArr: [{ fName: {}, fIcon: '', fTarget: '', fId: '', fRunsOn: '' }],
       superAdmin: '',
       superModerator: '',
       channelId: '',
       channelName: '',
       admin: '',
       moderator: '',
-      dashboardArr: [{ dIcon: '', dRef: '', dText: '', dId: '', dType: '', dRunsOn: '' }],
+      dashboardArr: [{ dIcon: '', dRef: '', dText: {}, dId: '', dType: '', dRunsOn: '' }],
       currentValues: [],
       langOptions: [
         { value: 'kan', text: 'Kannada' },
@@ -32,6 +32,7 @@ class App extends Component {
     this._onLangChange = this._onLangChange.bind(this);
     this._handleSlidePicChange = this._handleSlidePicChange.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
+    this.handleOrgNameChange = this.handleOrgNameChange.bind(this);
 
     this.handleFeedValuesChange = this.handleFeedValuesChange.bind(this);
     this.handleRemoveFeed = this.handleRemoveFeed.bind(this);
@@ -46,10 +47,28 @@ class App extends Component {
     this.handleAddChannel = this.handleAddChannel.bind(this);
   }
 
-  handleFeedValuesChange = (idx) => (e) => {
+  handleOrgNameChange = (lang) => (e) => {
+    let orgNameObj = this.state.orgName;
+    orgNameObj[lang] = e.target.value;
+    this.setState({ orgName: orgNameObj });
+  //  console.log(this.state);
+  }
+
+  handleFeedValuesChange = (idx, lang) => (e) => {
+    console.log(lang);
     const newFeed = this.state.feedsArr.map((feed, sidx) => {
       if (idx !== sidx) return feed;
-      return { ...feed, [e.target.name]: e.target.value };
+      
+      if(e.target.name !== 'fName') {
+        return { ...feed, [e.target.name]: e.target.value };
+      }  
+      else {
+      //   console.log(feed);
+         let temp = feed.fName;
+      //   console.log(temp);
+         temp[lang] = e.target.value;
+         return { ...feed, 'fName': temp}
+      } 
     })
 
     this.setState({ feedsArr: newFeed });
@@ -62,14 +81,20 @@ class App extends Component {
 
   handleAddFeed = () => {
     this.setState({
-      feedsArr: this.state.feedsArr.concat([{ fName: '', fIcon: '', fTarget: '', fId: '', fRunsOn: '' }])
+      feedsArr: this.state.feedsArr.concat([{ fName: {}, fIcon: '', fTarget: '', fId: '', fRunsOn: '' }])
     })
   }
 
-  handleDashboardValueChange = (idx) => (e) => {
+  handleDashboardValueChange = (idx, lang) => (e) => {
     const newDashboard = this.state.dashboardArr.map((dashboard, sIdx) => {
       if (idx !== sIdx) return dashboard;
-      return { ...dashboard, [e.target.name]: e.target.value };
+      if(e.target.name !== 'dText') {
+         return { ...dashboard, [e.target.name]: e.target.value };
+      } else {
+         const temp = dashboard.dText;
+         temp[lang] = e.target.value;
+         return { ...dashboard, 'dText':temp}  
+      }
     })
     this.setState({ dashboardArr: newDashboard });
   }
@@ -84,7 +109,7 @@ class App extends Component {
 
   handleAddDashboard = () => {
     this.setState({
-      dashboardArr: this.state.dashboardArr.concat([{ dIcon: '', dRef: '', dText: '', dId: '', dType: '', dRunsOn: '' }])
+      dashboardArr: this.state.dashboardArr.concat([{ dIcon: '', dRef: '', dText: {}, dId: '', dType: '', dRunsOn: '' }])
     })
   }
 
@@ -129,11 +154,11 @@ class App extends Component {
     e.preventDefault();
     var tempArr = [];
     for (var i = 0; i < e.target.files.length; i++) {
-      console.log(e.target.files[i].name);
+   //   console.log(e.target.files[i].name);
       tempArr.push({ 'name': e.target.files[i].name });
     }
     this.setState({ slideImages: tempArr });
-    console.log(this.state);
+  //  console.log(this.state);
   }
 
   _handleProfilePicChange(e) {
@@ -149,11 +174,11 @@ class App extends Component {
   */
   _handleSubmit(e) {
     e.preventDefault();
-    console.log(this.state);
-    const tempChArr = this.state.channelsArr;  
+ //   console.log(this.state);
+    const tempChArr = this.state.channelsArr;
     let channelObj = {};
     const len = tempChArr.length;
-    for(let i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       let t = tempChArr[i].channelId;
       channelObj[t] = tempChArr[i];
     }
@@ -171,15 +196,8 @@ class App extends Component {
       },
       "body": {
         "uiData": {
-          "langs": [
-            "eng",
-            "kan",
-            "tam"
-          ],
-          "orgName": {
-            "eng": this.state.orgName,
-            "tam": "ஸ்ரீ முருகன் மையம்"
-          },
+          "langs": this.state.langs,
+          "orgName": this.state.orgName,
           "orgLogo": this.state.orgLogo,
           "slides": this.state.slideImages,
           "feeds": this.state.feedsArr,
@@ -215,7 +233,12 @@ class App extends Component {
 
           <h3>Organisation Information</h3>
           Organization Id : <input type="text" value={this.state.orgId} onChange={(e) => this.setState({ orgId: e.target.value })} /><br />
-          Organization Name: <input type="text" value={this.state.orgName} onChange={(e) => this.setState({ orgName: e.target.value })} /><br />
+          {this.state.langs.map((lang, indx) => (
+            <div key={indx}>
+              Organization Name ({lang}): <input type="text" value={this.state.orgName.lang} onChange={this.handleOrgNameChange(lang)} /><br />
+            </div>
+          ))}
+
           Organization Logo: <input type="file" accept="image" onChange={this._handleProfilePicChange} /><br />
           Sliding Images: <input type="file" accept="image" onChange={this._handleSlidePicChange} multiple /><br />
 
@@ -242,13 +265,17 @@ class App extends Component {
           {this.state.feedsArr.map((feed, indx) => (
             <div key={indx}>
               <div>
-                Name: <input type="text" value={feed.fName} name="fName" onChange={this.handleFeedValuesChange(indx)} /><br />
+                {this.state.langs.map((lang, ind) => (
+                  <div key={ind}>
+                    Name ({lang}): <input type="text" value={feed.fName.lang} name="fName" onChange={this.handleFeedValuesChange(indx, lang)} /><br />
+                  </div>
+                ))}
                 Icon: <input type="text" value={feed.fIcon} name="fIcon" onChange={this.handleFeedValuesChange(indx)} /><br />
                 Target: <input type="text" value={feed.fTarget} name="fTarget" onChange={this.handleFeedValuesChange(indx)} /><br />
                 Id: <input type="text" value={feed.fId} name="fId" onChange={this.handleFeedValuesChange(indx)} /><br />
                 RunsOn: <input type="text" value={feed.fRunsOn} name="fRunsOn" onChange={this.handleFeedValuesChange(indx)} /><br />
               </div>
-              <div>
+              <div> 
                 <button type="button" onClick={this.handleRemoveFeed(indx)}>Remove X</button>
               </div>
             </div>
@@ -261,7 +288,11 @@ class App extends Component {
               <div>
                 Icon: <input type="text" value={dashboard.dIcon} name="dIcon" onChange={this.handleDashboardValueChange(indx)} /><br />
                 Ref: <input type="text" value={dashboard.dRef} name="dRef" onChange={this.handleDashboardValueChange(indx)} /><br />
-                Text: <input type="text" value={dashboard.dText} name="dText" onChange={this.handleDashboardValueChange(indx)} /><br />
+                {this.state.langs.map((lang, idx) => (
+                  <div key={idx}> 
+                   Text ({lang}): <input type="text" value={dashboard.dText.lang} name="dText" onChange={this.handleDashboardValueChange(indx, lang)} /><br /> 
+                  </div>
+                ))}
                 Id: <input type="text" value={dashboard.dId} name="dId" onChange={this.handleDashboardValueChange(indx)} /><br />
                 Type: <input type="text" value={dashboard.dType} name="dType" onChange={this.handleDashboardValueChange(indx)} /><br />
                 Runs On: <input type="text" value={dashboard.dRunsOn} name="dRunsOn" onChange={this.handleDashboardValueChange(indx)} /><br />
