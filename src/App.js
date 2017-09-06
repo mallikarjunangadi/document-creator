@@ -6,7 +6,7 @@ class App extends Component {
     super();
 
     this.state = {
-      orgId: '',
+      orgId: '', 
       orgName: {},
       orgLogo: '',
       slideImages: [],
@@ -55,7 +55,7 @@ class App extends Component {
   }
 
   handleFeedValuesChange = (idx, lang) => (e) => {
-    console.log(lang);
+    // console.log(lang);                                    
     const newFeed = this.state.feedsArr.map((feed, sidx) => {
       if (idx !== sidx) return feed;
       
@@ -237,7 +237,7 @@ class App extends Component {
             <div key={indx}>
               Organization Name ({lang}): <input type="text" value={this.state.orgName.lang} onChange={this.handleOrgNameChange(lang)} /><br />
             </div>
-          ))}
+          ))} 
 
           Organization Logo: <input type="file" accept="image" onChange={this._handleProfilePicChange} /><br />
           Sliding Images: <input type="file" accept="image" onChange={this._handleSlidePicChange} multiple /><br />
